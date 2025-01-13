@@ -30,7 +30,7 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /*
  * @title DecentralizedStableCoin
- * @author Patrick Collins
+ * @author Rahbar Ahmed
  * Collateral: Exogenous
  * Minting (Stability Mechanism): Decentralized (Algorithmic)
  * Value (Relative Stability): Anchored (Pegged to USD)
@@ -44,14 +44,7 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
     error DecentralizedStableCoin__BurnAmountExceedsBalance();
     error DecentralizedStableCoin__NotZeroAddress();
 
-    /*
-    In future versions of OpenZeppelin contracts package, Ownable must be declared with an address of the contract owner
-    as a parameter.
-    For example:
-    constructor() ERC20("DecentralizedStableCoin", "DSC") Ownable(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) {}
-    Related code changes can be viewed in this commit:
-    https://github.com/OpenZeppelin/openzeppelin-contracts/commit/13d5e0466a9855e9305119ed383e54fc913fdc60
-    */
+   
     constructor() ERC20("DecentralizedStableCoin", "DSC") { }
 
     function burn(uint256 _amount) public override onlyOwner {
