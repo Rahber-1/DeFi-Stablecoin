@@ -47,12 +47,12 @@ This project implements a **Decentralized Stablecoin (DSC)** system using Solidi
 
 ### **Prerequisites**
 - [Foundry](https://book.getfoundry.sh/getting-started/installation)
-- Node.js (for environment variable management)
+
 
 ### **Installation**
 ```sh
-git clone <repository_url>
-cd <project_directory>
+git clone  https://github.com/Rahber-1/DeFi-Stablecoin.git
+cd DeFi-Stablecoin
 forge install  # Install dependencies
 ```
 
@@ -80,6 +80,4 @@ forge script script/DeployDSC.s.sol:DeployDSC --fork-url http://127.0.0.1:8545 -
 ## License
 This project is licensed under the **MIT License**.
 
----
-If you have any questions, feel free to reach out! 🚀
 
