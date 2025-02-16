@@ -1,166 +1,85 @@
-# Foundry DeFi Stablecoin
+# Decentralized Stablecoin Deployment with Foundry
 
-.
+## Overview
+This project implements a **Decentralized Stablecoin (DSC)** system using Solidity and Foundry. It includes smart contracts for the stablecoin itself, an engine to manage its issuance and collateralization, and deployment scripts for different networks.
 
-
-
-# About
-
-This project is meant to be a stablecoin where users can deposit WETH and WBTC in exchange for a token that will be pegged to the USD.
-
-- [Foundry DeFi Stablecoin](#foundry-defi-stablecoin)
-- [About](#about)
-- [Getting Started](#getting-started)
-  - [Requirements](#requirements)
-  - [Quickstart](#quickstart)
-    - [Optional Gitpod](#optional-gitpod)
-- [Updates](#updates)
-- [Usage](#usage)
-  - [Start a local node](#start-a-local-node)
-  - [Deploy](#deploy)
-  - [Deploy - Other Network](#deploy---other-network)
-  - [Testing](#testing)
-    - [Test Coverage](#test-coverage)
-- [Deployment to a testnet or mainnet](#deployment-to-a-testnet-or-mainnet)
-  - [Scripts](#scripts)
-  - [Estimate gas](#estimate-gas)
-- [Formatting](#formatting)
-- [Slither](#slither)
-- [Additional Info:](#additional-info)
-  - [Let's talk about what "Official" means](#lets-talk-about-what-official-means)
-  - [Summary](#summary)
-- [Thank you!](#thank-you)
-
-# Getting Started
-
-## Requirements
-
-- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-  - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
-- [foundry](https://getfoundry.sh/)
-  - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (816e00b 2023-03-16T00:05:26.396218Z)`
-
-## Quickstart
-
+## Project Structure
 ```
-git clone https://github.com/Cyfrin/foundry-defi-stablecoin-cu
-cd foundry-defi-stablecoin-cu
-forge build
+├── src/
+│   ├── DecentralizedStableCoin.sol  # Stablecoin contract
+│   ├── DSCEngine.sol                # Engine managing collateral and issuance
+│
+├── test/
+│   ├── mocks/
+│   │   ├── MockV3Aggregator.sol     # Mock price feed for local testing
+│
+├── script/
+│   ├── DeployDSC.s.sol              # Deployment script
+│   ├── HelperConfig.s.sol           # Configuration for different networks
+│
+├── foundry.toml                     # Foundry configuration file
+└── README.md                         # Project documentation
 ```
 
+## Smart Contracts
 
+### **1. DecentralizedStableCoin.sol**
+- Implements an ERC20-based stablecoin.
+- Ownership is transferred to `DSCEngine` for decentralized control.
 
+### **2. DSCEngine.sol**
+- Manages the issuance and redemption of the stablecoin.
+- Ensures stability through over-collateralization using ETH and BTC.
 
+## Deployment Scripts
 
-# Usage
+### **DeployDSC.s.sol**
+- Fetches network-specific configurations from `HelperConfig`.
+- Deploys `DecentralizedStableCoin` and `DSCEngine`.
+- Transfers ownership of DSC to `DSCEngine`.
 
-## Start a local node
+### **HelperConfig.s.sol**
+- Defines configurations for Sepolia and Anvil networks.
+- Uses real price feeds on Sepolia and mocks for local testing.
+- Reads environment variables for private keys when deploying to Sepolia.
 
+## Setup & Deployment
+
+### **Prerequisites**
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
+- Node.js (for environment variable management)
+
+### **Installation**
+```sh
+git clone <repository_url>
+cd <project_directory>
+forge install  # Install dependencies
 ```
-make anvil
-```
 
-## Deploy
-
-This will default to your local node. You need to have it running in another terminal in order for it to deploy.
-
-```
-make deploy
-```
-
-## Deploy - Other Network
-
-
-
-## Testing
-
-
-
-1. Unit testing
-2. Invariant testing
-
-
-
-
-```
+### **Running Tests**
+```sh
 forge test
 ```
 
-### Test Coverage
-
-```
-forge coverage
-```
-
-and for coverage based testing:
-
-```
-forge coverage --report debug
+### **Local Deployment (Anvil)**
+```sh
+anvil &  # Start Anvil (local Ethereum testnet)
+forge script script/DeployDSC.s.sol:DeployDSC --fork-url http://127.0.0.1:8545 --broadcast
 ```
 
-# Deployment to a testnet or mainnet
+### **Testnet Deployment (Sepolia)**
+1. Set your `.env` file:
+   ```sh
+   PRIVATE_KEY=<your_private_key>
+   ```
+2. Deploy:
+   ```sh
+   forge script script/DeployDSC.s.sol:DeployDSC --rpc-url <sepolia_rpc_url> --broadcast
+   ```
 
-1. Setup environment variables
+## License
+This project is licensed under the **MIT License**.
 
-You'll want to set your `SEPOLIA_RPC_URL` and `PRIVATE_KEY` as environment variables. You can add them to a `.env` file.
-
-
-
-
-1. Deploy
-
-```
-make deploy ARGS="--network sepolia"
-```
-
-## Scripts
-
-Instead of scripts, we can directly use the `cast` command to interact with the contract.
-
-For example, on Sepolia:
-
-1. Get some WETH
-
-```
-cast send 0xdd13E55209Fd76AfE204dBda4007C227904f0a81 "deposit()" --value 0.1ether --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY
-```
-
-2. Approve the WETH
-
-```
-cast send 0xdd13E55209Fd76AfE204dBda4007C227904f0a81 "approve(address,uint256)" 0x091EA0838eBD5b7ddA2F2A641B068d6D59639b98 1000000000000000000 --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY
-```
-
-3. Deposit and Mint DSC
-
-```
-cast send 0x091EA0838eBD5b7ddA2F2A641B068d6D59639b98 "depositCollateralAndMintDsc(address,uint256,uint256)" 0xdd13E55209Fd76AfE204dBda4007C227904f0a81 100000000000000000 10000000000000000 --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY
-```
-
-## Estimate gas
-
-You can estimate how much gas things cost by running:
-
-```
-forge snapshot
-```
-
-And you'll see an output file called `.gas-snapshot`
-
-# Formatting
-
-To run code formatting:
-
-```
-forge fmt
-```
-
-# Slither
-
-```
-slither :; slither . --config-file slither.config.json
-```
-
-
-
+---
+If you have any questions, feel free to reach out! 🚀
 
